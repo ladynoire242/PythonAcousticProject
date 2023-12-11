@@ -5,6 +5,8 @@ class Controller:
     def __init__(self, model, view):
         self.model = model
         self.view = view
+        self.wav_file = None
+        self.filename = None
 
     def select_file(self):
         filetypes = (
@@ -20,13 +22,18 @@ class Controller:
         return _filename
 
     def filetype_checker(self, filepath):
+        # Gets File Extension
         ext = os.path.splitext(filepath)[-1].lower()
+
+        # If File is .wav
         if ext == ".wav":
             self.view.is_wav_fileformat("Selected file is already in .wav format")
             self.view.set_button_state('disabled')
+        # Is Audio File but not .wav
         elif ext == ".mp3" or ext == '.m4a':
             self.view.wrong_audio_format("Selected audio file is not in .wav format")
             self.view.set_button_state('enabled')
+        # Is not an audio file
         else:
             self.view.not_audio_format("Selected file is not an audio file")
             self.view.set_button_state('disabled')
@@ -50,6 +57,9 @@ class Controller:
         # Creates variable of same file name but with wav file type and removes all spaces
         spacehold = file.replace(" ", "_")
         new_file_dir = spacehold.replace(ext, ".wav")
+        self.filename = spacehold.replace(ext, '')
+        self.wav_file = new_file_dir
+
 
         # Changes current directory to dir
         os.chdir(dir)
@@ -57,3 +67,6 @@ class Controller:
         # Exports selected audio to wav
         new_file = AudioSegment.from_file(filepath, format=f'{filetype}')
         new_file.export(new_file_dir, format='wav')
+
+    def graph_data(self):
+        return self.model.main_functionality(self.wav_file, self.filename)
